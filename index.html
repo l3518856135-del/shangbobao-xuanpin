@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>上播前·选品体检 — 直播营销选品合规决策工具</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ========== 顶部栏 ========== -->
+    <header class="topbar">
+      <div class="topbar__brand">
+        <span class="topbar__logo" aria-hidden="true">检</span>
+        <div class="topbar__titles">
+          <h1 class="topbar__title">上播前·选品体检</h1>
+          <p class="topbar__subtitle">直播营销选品合规决策工具</p>
+        </div>
+      </div>
+      <div class="topbar__meta">
+        <span class="tag tag--rule">规则库 v0.2（修订稿）</span>
+        <span class="tag tag--date">依据截至 2026-10</span>
+        <details class="demo-menu">
+          <summary class="btn btn--primary btn--sm">演示模式</summary>
+          <div class="demo-menu__list">
+            <button type="button" id="btn-demo-green">绿·可播（烟台苹果）</button>
+            <button type="button" id="btn-demo-yellow">黄·整改（莱阳梨膏）</button>
+            <button type="button" id="btn-demo-red">红·禁播（冒用报告）</button>
+          </div>
+        </details>
+        <button type="button" class="btn btn--ghost btn--sm" id="btn-rules">查看规则库</button>
+        <button type="button" class="btn btn--ghost btn--sm" id="btn-privacy">隐私说明</button>
+      </div>
+    </header>
+
+    <!-- ========== 主流程步骤条 ========== -->
+    <nav class="stepper" aria-label="体检流程">
+      <ol class="stepper__list">
+        <li class="stepper__item is-active" data-step="1">
+          <span class="stepper__dot">1</span><span class="stepper__label">分流</span>
+        </li>
+        <li class="stepper__item" data-step="2">
+          <span class="stepper__dot">2</span><span class="stepper__label">资料录入</span>
+        </li>
+        <li class="stepper__item" data-step="3">
+          <span class="stepper__dot">3</span><span class="stepper__label">证据核验</span>
+        </li>
+        <li class="stepper__item" data-step="4">
+          <span class="stepper__dot">4</span><span class="stepper__label">规则判定</span>
+        </li>
+        <li class="stepper__item" data-step="5">
+          <span class="stepper__dot">5</span><span class="stepper__label">人工审核</span>
+        </li>
+        <li class="stepper__item" data-step="6">
+          <span class="stepper__dot">6</span><span class="stepper__label">档案导出</span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- ========== 主内容区 ========== -->
+    <main class="content">
+      <!-- 分流向导 -->
+      <section class="wizard" id="wizard" aria-label="决策向导">
+        <div class="wizard__head">
+          <h2 class="wizard__title">第 1 步 · 选品分流</h2>
+          <p class="wizard__hint">先确定<b>产品类型</b>、<b>销售主体</b>与<b>带货平台</b>，再套用对应规则线。类型选错，会把"带泥的萝卜"误判为需 SC 的预包装食品。</p>
+        </div>
+
+        <!-- 子步骤 A：产品类型 -->
+        <fieldset class="choice-group" id="group-type">
+          <legend class="choice-group__legend">
+            <span class="choice-group__index">A</span> 产品类型（四选一）
+          </legend>
+          <div class="choice-grid">
+            <button type="button" class="choice-card" data-field="type" data-value="NC">
+              <span class="choice-card__badge choice-card__badge--green">食用农产品</span>
+              <span class="choice-card__desc">无需 SC，不适用预包装标签<br />需承诺达标合格证（畜禽加检疫证明）</span>
+            </button>
+            <button type="button" class="choice-card" data-field="type" data-value="YB">
+              <span class="choice-card__badge">预包装食品</span>
+              <span class="choice-card__desc">SC 证 + GB7718 标签 + GB28050 营养标签（豁免品类除外）</span>
+            </button>
+            <button type="button" class="choice-card" data-field="type" data-value="BJ">
+              <span class="choice-card__badge">保健食品</span>
+              <span class="choice-card__desc">蓝帽子 + 注册/备案号；普通食品不得宣称保健功能</span>
+            </button>
+            <button type="button" class="choice-card" data-field="type" data-value="DL">
+              <span class="choice-card__badge">地理标志农产品</span>
+              <span class="choice-card__desc">专用标志须授权、不得冒用；需使用许可证明与产地一致性</span>
+            </button>
+          </div>
+        </fieldset>
+
+        <!-- 子步骤 B：销售主体 -->
+        <fieldset class="choice-group" id="group-subject" disabled>
+          <legend class="choice-group__legend">
+            <span class="choice-group__index">B</span> 销售主体（三选一）
+          </legend>
+          <div class="choice-grid choice-grid--3">
+            <button type="button" class="choice-card" data-field="subject" data-value="farmer">
+              <span class="choice-card__badge">农户自产自销</span>
+              <span class="choice-card__desc">自家种植/养殖，直接售卖</span>
+            </button>
+            <button type="button" class="choice-card" data-field="subject" data-value="coop">
+              <span class="choice-card__badge">合作社</span>
+              <span class="choice-card__desc">农民专业合作社组织生产销售</span>
+            </button>
+            <button type="button" class="choice-card" data-field="subject" data-value="company">
+              <span class="choice-card__badge">企业经销</span>
+              <span class="choice-card__desc">持有营业执照的企业经销商</span>
+            </button>
+          </div>
+        </fieldset>
+
+        <!-- 子步骤 C：带货平台 -->
+        <fieldset class="choice-group" id="group-platform" disabled>
+          <legend class="choice-group__legend">
+            <span class="choice-group__index">C</span> 带货平台
+          </legend>
+          <div class="choice-grid choice-grid--3">
+            <button type="button" class="choice-card" data-field="platform" data-value="douyin">
+              <span class="choice-card__badge">抖音</span>
+              <span class="choice-card__desc">当前支持（MVP）<br />适用抖音直播带货规则</span>
+            </button>
+            <button type="button" class="choice-card choice-card--disabled" data-field="platform" data-value="kuaishou" disabled>
+              <span class="choice-card__badge">快手</span>
+              <span class="choice-card__desc">敬请期待</span>
+            </button>
+            <button type="button" class="choice-card choice-card--disabled" data-field="platform" data-value="taobao" disabled>
+              <span class="choice-card__badge">淘宝</span>
+              <span class="choice-card__desc">敬请期待</span>
+            </button>
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- 结果摘要：本次适用规则线 -->
+      <aside class="summary" id="summary" aria-label="适用规则线摘要" hidden>
+        <h3 class="summary__title">本次适用规则线</h3>
+        <div class="summary__rules" id="summary-rules"></div>
+        <div class="summary__actions">
+          <button type="button" class="btn btn--ghost" id="btn-reset">重新分流</button>
+          <button type="button" class="btn btn--primary" id="btn-next" disabled title="请先完成分流选择">
+            进入资料录入
+          </button>
+        </div>
+        <p class="summary__tip">提示：本工具仅做本地研判与合规提示，结果供内部决策参考，不构成法律意见。</p>
+      </aside>
+
+      <!-- 资料录入表单（D2） -->
+      <section class="wizard" id="entry" aria-label="资料录入" hidden>
+        <div class="wizard__head">
+          <h2 class="wizard__title">第 2 步 · 资料录入</h2>
+          <p class="wizard__hint">录入产品与资质信息。<b>关键字段（SC 号 / 统一社会信用代码 / 报告编号等）需人工确认后才会进入判定</b>，防止识错一处全错。支持 OCR 图片识别（可选），未配置密钥时保持手录。</p>
+        </div>
+
+        <form id="entry-form" autocomplete="off" novalidate>
+          <!-- OCR 图片识别通道（D8，可选） -->
+          <div class="ocr" id="ocr">
+            <div class="ocr__head">
+              <h3 class="ocr__title">OCR 图片识别（可选）</h3>
+              <span class="ocr__badge">AI 多模态 · 结果回显须人工核对</span>
+            </div>
+            <p class="ocr__hint">上传一张包装图 / 标签图，自动识别字段并回填到下方表单（可编辑）。未配置密钥时自动保持手录，不影响使用。</p>
+            <div class="ocr__row">
+              <label class="btn btn--primary ocr__upload" for="ocr-file">
+                上传图片识别
+                <input type="file" id="ocr-file" accept="image/*" capture="environment" hidden />
+              </label>
+              <span class="ocr__status" id="ocr-status" role="status">尚未识别</span>
+            </div>
+            <details class="ocr__key">
+              <summary>配置识别密钥（可选，仅存本机浏览器）</summary>
+              <div class="ocr__keyrow">
+                <input class="field__input ocr__keyinput" id="ocr-key" type="password" placeholder="粘贴智谱 GLM API Key（glm-4v-flash）" autocomplete="off" />
+                <button type="button" class="btn btn--ghost" id="ocr-key-save">保存</button>
+              </div>
+              <p class="ocr__keynote">密钥仅保存在本机浏览器 localStorage，不会上传到任何服务器。未配置时点击识别会自动切换回手录模式。</p>
+            </details>
+          </div>
+
+          <!-- 通用产品信息 -->
+          <fieldset class="form-group">
+            <legend class="form-group__legend">产品信息</legend>
+            <div class="form-grid">
+              <label class="field">
+                <span class="field__label">产品名称 <em>*</em></span>
+                <input class="field__input" type="text" data-key="productName" placeholder="如：烟台苹果 / 德州扒鸡 / 章丘大葱" />
+              </label>
+              <label class="field">
+                <span class="field__label">申报品类 <em>*</em></span>
+                <input class="field__input" type="text" data-key="category" placeholder="如：蔬菜制品-酱腌菜 / 水果" />
+              </label>
+              <label class="field">
+                <span class="field__label">生产者 / 生产企业</span>
+                <input class="field__input" type="text" data-key="producer" placeholder="营业执照上的主体名称" />
+              </label>
+              <label class="field">
+                <span class="field__label">产地 / 生产地址</span>
+                <input class="field__input" type="text" data-key="origin" placeholder="如：山东省烟台市栖霞市" />
+              </label>
+              <label class="field">
+                <span class="field__label">净含量 / 规格</span>
+                <input class="field__input" type="text" data-key="spec" placeholder="如：500g/盒" />
+              </label>
+              <label class="field">
+                <span class="field__label">生产日期</span>
+                <input class="field__input" type="date" data-key="produceDate" />
+              </label>
+              <label class="field">
+                <span class="field__label">保质期</span>
+                <input class="field__input" type="text" data-key="shelfLife" placeholder="如：12 个月 / 常温 90 天" />
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- 检测报告信息（D14：用于与申报产品比对，识别冒用/错配报告） -->
+          <fieldset class="form-group">
+            <legend class="form-group__legend">检测报告信息（可选，有报告时填写）</legend>
+            <div class="form-grid">
+              <label class="field">
+                <span class="field__label">报告编号</span>
+                <input class="field__input" type="text" data-key="reportNo" placeholder="如：SDJC-2026-0912" />
+              </label>
+              <label class="field">
+                <span class="field__label">报告上的产品名称</span>
+                <input class="field__input" type="text" data-key="reportProductName" placeholder="照抄报告原文的产品名称" />
+              </label>
+              <label class="field">
+                <span class="field__label">报告上的规格</span>
+                <input class="field__input" type="text" data-key="reportSpec" placeholder="如：260g/瓶" />
+              </label>
+              <label class="field">
+                <span class="field__label">报告上的批号</span>
+                <input class="field__input" type="text" data-key="reportBatch" placeholder="如：20260915" />
+              </label>
+              <label class="field">
+                <span class="field__label">CMA / CNAS 标识</span>
+                <select class="field__input" data-key="reportCert">
+                  <option value="">— 请选择 —</option>
+                  <option>两者都有</option>
+                  <option>仅 CMA</option>
+                  <option>仅 CNAS</option>
+                  <option>都没有 / 不确定</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field__label">报告检验结论</span>
+                <select class="field__input" data-key="reportConclusion">
+                  <option value="">— 请选择 —</option>
+                  <option>合格</option>
+                  <option>不合格</option>
+                  <option>仅部分项目检测</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field__label">报告有效期至</span>
+                <input class="field__input" type="date" data-key="reportValidUntil" />
+              </label>
+            </div>
+            <p class="form-group__hint">提示：报告只对送检样品负责。产品名称/规格与申报品不一致判红；结论不合格或报告已过有效期判黄；缺 CMA/CNAS 资质标识会提示人工核对。</p>
+          </fieldset>
+
+          <!-- 资质要点（按产品类型动态） -->
+          <fieldset class="form-group">
+            <legend class="form-group__legend">资质要点（随产品类型变化）</legend>
+            <div class="form-grid" id="spec-fields">
+              <!-- 通过 JS 动态渲染 -->
+            </div>
+          </fieldset>
+
+          <!-- 宣称文案：分开采集"包装/页面"与"直播间口播"（口径不同，违规高发在口播） -->
+          <fieldset class="form-group">
+            <legend class="form-group__legend">宣称文案（包装 / 页面 与 直播间口播）</legend>
+            <div class="form-grid">
+              <label class="field">
+                <span class="field__label">包装标签 / 商品页面文案</span>
+                <textarea class="field__textarea" data-key="claimText" rows="3" placeholder="包装、详情页上的宣称，如：'顶级食材，全网最低价'"></textarea>
+              </label>
+              <label class="field">
+                <span class="field__label">直播间口播稿</span>
+                <textarea class="field__textarea" data-key="oralClaim" rows="3" placeholder="主播准备说的话，如：'吃了能降三高，一周见效'"></textarea>
+              </label>
+            </div>
+            <p class="field__hint">两处文案分别与规则库词表比对，命中时在判定明细中标明来源（包装 / 口播）。</p>
+          </fieldset>
+
+          <p class="entry-hint" id="entry-hint">填写以上信息后，点击「证据核验」开始核验（关键字段须人工确认）。</p>
+          <div class="form-actions">
+            <button type="button" class="btn btn--ghost" id="btn-back">返回分流</button>
+            <button type="button" class="btn btn--ghost" id="btn-save">暂存草稿</button>
+            <button type="button" class="btn btn--primary" id="btn-check">证据核验</button>
+            <button type="button" class="btn btn--primary" id="btn-judge">规则判定</button>
+          </div>
+          <p class="form-save-tip" id="save-tip" hidden>草稿已暂存到本地浏览器（localStorage）。</p>
+        </form>
+
+        <!-- 证据核验结果（D3） -->
+        <div class="verify" id="verify" hidden>
+          <h3 class="verify__title">第 3 步 · 证据核验结果</h3>
+          <p class="verify__meta" id="verify-meta"></p>
+          <div class="verify__list" id="verify-list"></div>
+          <p class="verify__note">说明：统一社会信用代码校验位由 GB 32100-2015 附录A 本地实算，仅供结构自检，最终以市场监督管理部门公示系统为准；SC 号仅做 14 位结构校验，不校验其校验位。</p>
+        </div>
+
+        <!-- 规则判定结果（D4） -->
+        <div class="judge" id="judge" hidden>
+          <h3 class="judge__title">第 4 步 · 规则判定结果</h3>
+          <div class="judge__badge" id="judge-badge"></div>
+          <p class="judge__summary" id="judge-summary"></p>
+          <div class="judge__list" id="judge-list"></div>
+          <div class="judge__todo" id="judge-todo" hidden></div>
+          <p class="judge__note">说明：以上判定由规则库词表命中与字段一致性交叉得出，仅作本地合规提示，最终须经人工审核签字生效（第 5 步）。AI 不生成法条，条款号以【待核对】标注。</p>
+          <div class="judge__actions">
+            <button type="button" class="btn btn--ghost" id="btn-rectify" hidden>生成整改单</button>
+            <button type="button" class="btn btn--primary" id="btn-review">进入人工审核</button>
+          </div>
+        </div>
+
+        <!-- 人工审核台（D6） -->
+        <div class="review" id="review" hidden>
+          <h3 class="review__title">第 5 步 · 人工审核</h3>
+          <p class="review__meta" id="review-meta"></p>
+          <div class="review__list" id="review-list"></div>
+          <div class="review__sign">
+            <div class="review__sign-row">
+              <label class="review__label" for="review-verdict">审核结论</label>
+              <select class="review__select" id="review-verdict">
+                <option value="">— 请选择 —</option>
+                <option>通过（可上播）</option>
+                <option>整改后上播</option>
+                <option>禁播</option>
+              </select>
+            </div>
+            <div class="review__sign-row">
+              <label class="review__label" for="review-signer">审核人签字</label>
+              <input class="review__input" id="review-signer" type="text" placeholder="审核人姓名（手签/键入）" />
+            </div>
+            <div class="review__sign-row">
+              <label class="review__label" for="review-date">审核日期</label>
+              <input class="review__input" id="review-date" type="date" />
+            </div>
+            <div class="review__sign-row">
+              <label class="review__label" for="review-owner">整改责任人</label>
+              <input class="review__input" id="review-owner" type="text" placeholder="供应商/生产方联系人（写进档案）" />
+            </div>
+            <div class="review__sign-row">
+              <label class="review__label" for="review-note">审核备注</label>
+              <input class="review__input" id="review-note" type="text" placeholder="如：已电话核实报告原件" />
+            </div>
+            <label class="review__check"><input type="checkbox" id="review-recheck" /> 需整改后复评</label>
+            <div class="review__sign-row">
+              <button type="button" class="btn btn--primary" id="btn-review-commit">签字生效</button>
+            </div>
+          </div>
+          <p class="review__state" id="review-state" hidden></p>
+          <div class="review__actions">
+            <button type="button" class="btn btn--primary" id="btn-archive">导出档案（第 6 步）</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 体检档案（D7） -->
+      <section class="archive" id="archive" aria-label="体检档案" hidden>
+        <div class="archive__toolbar">
+          <h2 class="archive__title">第 6 步 · 体检档案</h2>
+          <div class="archive__bar">
+            <label class="archive__toggle"><input type="checkbox" id="archive-mask" /> 脱敏显示（隐藏企业/信用代码/许可证号）</label>
+            <button type="button" class="btn btn--ghost" id="btn-csv">导出 CSV 台账</button>
+            <button type="button" class="btn btn--primary" id="btn-print">打印 / 导出 PDF</button>
+            <button type="button" class="btn btn--ghost" id="btn-archive-back">返回</button>
+          </div>
+        </div>
+        <div class="archive__body" id="archive-body"></div>
+      </section>
+
+      <!-- 整改单（D13） -->
+      <section class="rectify" id="rectify" aria-label="整改单" hidden>
+        <div class="rectify__toolbar">
+          <h2 class="rectify__title">直播选品整改单</h2>
+          <div class="rectify__bar">
+            <button type="button" class="btn btn--primary" id="btn-rectify-print">打印 / 导出 PDF</button>
+            <button type="button" class="btn btn--ghost" id="btn-rectify-close">关闭</button>
+          </div>
+        </div>
+        <div class="rectify__body" id="rectify-body"></div>
+      </section>
+
+      <!-- 规则库查看（D7） -->
+      <section class="rules-viewer" id="rules-viewer" aria-label="规则库查看" hidden>
+        <div class="rules-viewer__head">
+          <h2 class="rules-viewer__title">规则库查看（v0.1 草案）</h2>
+          <button type="button" class="btn btn--ghost" id="btn-rules-close">关闭</button>
+        </div>
+        <p class="rules-viewer__note" id="rules-viewer-note"></p>
+        <div class="rules-viewer__list" id="rules-viewer-list"></div>
+      </section>
+
+      <!-- 隐私说明（D10） -->
+      <section class="privacy" id="privacy" aria-label="隐私说明" hidden>
+        <div class="privacy__head">
+          <h2 class="privacy__title">隐私说明</h2>
+          <button type="button" class="btn btn--ghost" id="btn-privacy-close">关闭</button>
+        </div>
+        <div class="privacy__body">
+          <ul class="privacy__list">
+            <li><b>纯前端本地运行</b>：本工具无后端服务器，所有判定均在您的浏览器内完成，录入资料不会被上传到云端。</li>
+            <li><b>本地暂存</b>：草稿、审核档案、误报记录与 OCR 密钥均暂存在本机浏览器 localStorage，关闭页面不丢失、换设备不互通。</li>
+            <li><b>OCR 识别（可选）</b>：仅在您主动配置密钥后，上传的包装图会<u>直连智谱 open.bigmodel.cn</u>做识别，其余任何场景不向第三方上传。未配置密钥 = 完全离线。</li>
+            <li><b>脱敏导出</b>：档案导出支持「脱敏显示」开关，企业名称 / 统一社会信用代码 / SC 号可一键遮挡。</li>
+            <li><b>不留存云端</b>：不采集、不追踪、不上报，您可以随时一键清除本地全部数据。</li>
+          </ul>
+          <div class="privacy__actions">
+            <button type="button" class="btn btn--ghost" id="btn-clear-data">清除本地全部数据</button>
+          </div>
+          <p class="privacy__tip">提示：本工具仅供内部决策参考，不构成法律意见；法规依据均来自人工编审的规则库，AI 不生成法条。</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- ========== 底部 ========== -->
+    <footer class="footbar">
+      <p>「上播前·选品体检」· 助农直播选品合规决策工具 · 纯前端本地运行 · 不留存资料</p>
+      <p class="footbar__legal">法规依据均来自人工编审的规则库；AI 不生成法条，语义判断仅作提示、须人工签字生效。</p>
+    </footer>
+  </div>
+
+  <script src="js/rules-data.js"></script>
+  <script src="js/validate.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

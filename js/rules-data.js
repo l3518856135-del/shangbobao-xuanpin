@@ -1,0 +1,74 @@
+/* ============================================================
+   rules-data.js —— 规则库运行时数据
+   ============================================================
+   说明：
+   1. 本文件与 data/rules.json 为同一份规则数据（JSON 为权威源）。
+   2. 保留本文件的原因：纯前端双击 index.html 打开时，
+      浏览器会拦截 fetch() 读取本地 file:// 的 JSON（同源限制），
+      故把规则数据以 window.RULE_BASE 形式内联，保证双击即用。
+   3. 修改规则：请先改 data/rules.json，再同步本文件。
+   4. 红线：AI 不生成法条；所有【待核对】条款号需人工确认后方可启用。
+   ============================================================ */
+
+window.RULE_BASE = {
+  meta: {
+    version: "0.2",
+    name: "上播前·选品体检 规则库",
+    status: "修订稿 v0.2：AI 起草并完成三轮自查整改，部分条款已核对（标【已核对】）；仍待人工编审后升 v1.0，不得直接用于对外判定",
+    updated: "2026-10",
+    engineNote: "RULE=硬规则，结果100%可复核；AI-SEMANTIC=只提示不判定，须人工终审",
+    versionRule: "v0.x=修订稿（未完成人工编审）；v1.0=人工编审后首版；每次修订 +0.1",
+    redLine: "AI 不生成法条；所有【待核对】条款号须人工确认后方可启用"
+  },
+
+  judgeLevels: {
+    RED:    { name: "红·禁播",   meaning: "存在硬性违法/违规事实", action: "生成禁播说明+法条引用，人工签字" },
+    YELLOW: { name: "黄·整改",   meaning: "整改后可播：待核验/缺项/表述需修改", action: "生成整改单" },
+    GREEN:  { name: "绿·可播",   meaning: "类型正确、资质齐全有效、宣称合规", action: "生成通过卡" },
+    GRAY:   { name: "灰·信息不足", meaning: "无法判定，不误判为违规", action: "生成待补充材料清单" }
+  },
+
+  scCategoryCodes: {
+    _note: "32类食品生产许可分类目录对照表，D4 判定时使用；此处占位，待人工核对录入",
+    _source: "《食品生产许可管理办法》+ 食品生产许可分类目录（市监总局公告）",
+    "1601": "蔬菜制品"
+  },
+
+  wordLists: {
+    _note: "违禁词/绝对化用语词表，D4 判定时使用；此处为框架占位",
+    _absoluteNote: "2026-10-25 收窄：原裸词“最/第一”会误杀“最后一天/第一场直播/最近”，改为组合词；依《广告法》第九条（三）并结合语境由人工终裁。2026-10-25 第三轮复测再补最便宜/全国第一/第一名/最划算/最优惠/最高档/行业第一",
+    absolute: ["最好", "最佳", "最强", "最优", "最低价", "最高级", "国家级", "顶级", "全网最低", "第一品牌", "销量第一", "100%有效", "绝对", "最便宜", "全国第一", "第一名", "最划算", "最优惠", "最高档", "行业第一"],
+    _diseaseNote: "2026-10-25 扩充：补止咳/化痰/平喘/消炎/降三高/降血脂/降糖/治感冒等医疗用语；第三轮复测再补止痛/清肺/排毒/防感冒",
+    diseaseTreatment: ["治疗", "治愈", "降血压", "降血糖", "降血脂", "降糖", "降三高", "抗癌", "包治", "止咳", "化痰", "平喘", "消炎", "治感冒", "缓解症状", "辅助治疗", "止痛", "清肺", "排毒", "防感冒"],
+    healthFunction: ["增强免疫力", "改善睡眠", "减肥", "通便"],
+    _promiseNote: "2026-10-25 新增：承诺性效果表述词表（R-COM-005 接线）；第三轮复测补“安全性绝对承诺”词表",
+    effectPromise: ["一周见效", "三天见效", "七天见效", "一次见效", "立竿见影", "无效退款", "根治", "永不复发"],
+    safetyClaim: ["无副作用", "零副作用", "无任何副作用", "绝对安全"],
+    _authorityNote: "2026-10-25 新增：虚构权威背书词表（R-COM-004 接线，命中即要求上传佐证）",
+    authorityClaim: ["央视推荐", "央视上榜", "政府指定", "国家指定", "国家认证", "权威认证", "荣获国家级", "获奖品牌"]
+  },
+
+  rules: [
+    { id: "R-COM-001", name: "疾病治疗/预防功能宣称", category: "COM", platform: "GENERAL", trigger: "宣称文本命中疾病治疗/预防词表（RULE词表）", level: "RED", engine: "RULE", basis: { law: "《广告法》第十七条、《食品安全法》第七十三条第一款、《直播电商经营者落实食品安全主体责任监督管理规定》第十九条第（三）项", note: "【已核对 2026-10-25】广告法17条：除医疗/药品/医疗器械广告外，禁止涉及疾病治疗功能、不得使用医疗用语；120号令19条（三）：不得明示或暗示食品具有疾病预防、治疗功能", link: "https://www.gov.cn/gongbao/2026/issue_12666/202604/content_7065111.html" }, action: "删除功效表述，改为资质范围内的原料或口感描述", risk_note: "普通食品宣称疾病治疗/预防功能属严重违法", source: "《广告法》《食品安全法》《直播电商经营者落实食品安全主体责任监督管理规定》" },
+    { id: "R-COM-002", name: "非保健食品宣称保健功能", category: "COM", platform: "GENERAL", trigger: "命中保健功能目录词（增强免疫力/改善睡眠/减肥/通便等）", level: "RED", engine: "RULE", basis: { law: "《直播电商经营者落实食品安全主体责任监督管理规定》第十九条第（四）项、《广告法》第十八条、《食品安全法》第七十八条", note: "【已核对 2026-10-25】120号令19条（四）：不得对保健食品之外的其他食品声称具有保健功能；广告法18条/食安法78条规范保健食品广告与标签，功能宣传须以批准证书或说明书为准", link: "https://www.gov.cn/gongbao/2026/issue_12666/202604/content_7065111.html" }, action: "删除保健功能表述；如产品为保健食品切换到保健食品线", risk_note: "非保健食品宣称保健功能违法", source: "《直播电商经营者落实食品安全主体责任监督管理规定》《广告法》《食品安全法》" },
+    { id: "R-COM-003", name: "绝对化用语", category: "COM", platform: "GENERAL", trigger: "命中绝对化词表（最好/最佳/最强/国家级/顶级/全网最低/第一品牌/销量第一等组合词）", level: "YELLOW", engine: "RULE", basis: { law: "《广告法》第九条第（三）项", note: "【已核对 2026-10-25】法条原文为“国家级、最高级、最佳等用语”；绝对化认定需结合语境，例外由人工裁决", link: "https://www.gov.cn/guoqing/2021-10/29/content_5647620.htm" }, action: "给出具体替换建议：“最好/最佳/顶级/全网最低”→“当季精选/受消费者欢迎/同品类中价格实惠”；删除无依据的排名表述；语境例外由人工裁决", risk_note: "使用绝对化用语违反《广告法》第九条", source: "《广告法》" },
+    { id: "R-COM-004", name: "虚构权威背书/荣誉", category: "COM", platform: "GENERAL", trigger: "出现\"央视推荐/政府指定/获XX奖\"等背书但无对应佐证材料", level: "YELLOW", engine: "RULE", basis: { law: "《广告法》第二十八条、《直播电商经营者落实食品安全主体责任监督管理规定》第十九条第（六）项", note: "虚假广告认定仍需结合证据【待核对适用】；120号令19条（六）已核对 2026-10-25：不得对食品产地、成分、功能、检验、认证、质量、执行标准等作虚假或者引人误解的商业宣传", link: "https://www.gov.cn/gongbao/2026/issue_12666/202604/content_7065111.html" }, action: "上传佐证或删除背书表述", risk_note: "虚构荣誉背书涉嫌虚假广告", source: "《广告法》《反不正当竞争法》《直播电商经营者落实食品安全主体责任监督管理规定》" },
+    { id: "R-COM-005", name: "承诺性效果/安全性表述", category: "COM", platform: "GENERAL", trigger: "命中\"一周见效/无效退款/无副作用/绝对安全\"等功效或安全性承诺组合", level: "YELLOW", engine: "RULE", basis: { law: "《广告法》第二十八条", note: "条款号【待核对】；安全性绝对承诺参照《广告法》第十八条第（一）项（保健食品广告不得表示功效、安全性的断言或保证）", link: "" }, action: "改为体验性描述（\"口感软糯\"替代\"吃了就好\"）；删除\"无副作用/绝对安全\"等安全性保证", risk_note: "承诺性效果或安全性表述可能构成虚假广告", source: "《广告法》" },
+    { id: "R-COM-006", name: "冒用检测报告/报告与产品不符", category: "COM", platform: "GENERAL", trigger: "报告产品名/规格/批号与申报产品比对不一致（名/规格不符判红，批号不符判黄）", level: "RED", engine: "RULE", basis: { law: "《产品质量法》、《直播电商经营者落实食品安全主体责任监督管理规定》第十九条第（六）项", note: "《产品质量法》条号【待核对】；120号令19条（六）已核对 2026-10-25：不得对检验、认证、质量等作虚假或者引人误解的商业宣传", link: "https://www.gov.cn/gongbao/2026/issue_12666/202604/content_7065111.html" }, action: "提供与申报产品一致的检测报告；批号不符时补充该批次报告或说明", risk_note: "检测报告仅对样品负责，冒用或错配属造假", source: "《产品质量法》《直播电商经营者落实食品安全主体责任监督管理规定》" },
+    { id: "R-YB-001", name: "预包装食品无SC证", category: "YB", platform: "GENERAL", trigger: "预包装线且 SC 字段为空：生产/自销主体判红；经销主体降黄（仅销售预包装食品依法不需许可，需备案）", level: "RED", engine: "RULE", basis: { law: "《食品安全法》第三十五条、《直播电商经营者落实食品安全主体责任监督管理规定》第十六条第二款", note: "【已核对 2026-10-25】生产需许可；销售食用农产品不需许可，仅销售预包装食品需备案；SC 属生产企业持有；120号令16条第二款要求直播选品核验食品相关许可或备案，记录保存自直播结束之日起不少于三年", link: "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/fgs/art/2023/art_6bff4ef87291497fa72949e1fc88efb5.html" }, action: "补充生产企业 SC 证件；若为委托加工，补充委托方与受托方对应关系；经销主体核实生产企业持证与仅销售预包装食品备案", risk_note: "生产无证违法；仅销售预包装食品需备案，SC 应为生产企业持有", source: "《食品安全法》" },
+    { id: "R-YB-002", name: "SC号结构异常", category: "YB", platform: "GENERAL", trigger: "非14位数字 / 前3位不在分类目录内 / 区划码非法", level: "YELLOW", engine: "RULE", basis: { law: "《食品生产许可管理办法》", note: "条号【待核对】", link: "" }, action: "提示重拍/核对证号；跳转官方平台人工核验（仅结构校验，不联网验真）", risk_note: "SC第14位校验码算法未公开，不校验最后一位正确性", source: "《食品生产许可管理办法》" },
+    { id: "R-YB-003", name: "SC类别码与申报品类不符", category: "YB", platform: "GENERAL", trigger: "类别码对应品类与申报品类不一致（如蔬菜制品1601）", level: "YELLOW", engine: "RULE", basis: { law: "食品生产许可分类目录（32类）", note: "对照表待录入", link: "" }, action: "核对品类归属，必要时改为实际工艺品类", risk_note: "类别码与品类不符提示资质可能错配", source: "市监总局分类目录公告" },
+    { id: "R-YB-004", name: "预包装标签缺项", category: "YB", platform: "GENERAL", trigger: "缺名称/配料表/净含量/生产者及联系方式/生产日期/保质期/SC号/贮存条件/产品标准代号任一", level: "YELLOW", engine: "RULE", basis: { law: "GB 7718-2011《预包装食品标签通则》第 4.1.1 条", note: "【已核对 2026-10-25】4.1.1 规定九项强制标示内容", link: "https://www.nhc.gov.cn/zwgkzt/cybz/201106/a054a6affd0e489da150cf2b51a971a7/files/e84256474d1445919246b4a41a87f172.pdf" }, action: "列出缺项清单；补全后重新体检", risk_note: "标签法定要素缺项违反 GB 7718", source: "GB 7718-2011" },
+    { id: "R-YB-005", name: "营养标签缺失", category: "YB", platform: "GENERAL", trigger: "无营养成分表（豁免品类除外：生鲜食品、乙醇≥0.5%饮料等）", level: "YELLOW", engine: "RULE", basis: { law: "GB 28050-2011《预包装食品营养标签通则》第 7 章", note: "【已核对 2026-10-25】第 7 章豁免：生鲜食品、乙醇≥0.5%酒类、小面积包装、现制现售、包装饮用水、日食用量≤10g 等", link: "https://www.gov.cn/govweb/gzdt/att/att/site1/20120709/001e3741a4741164d66215.pdf" }, action: "补营养标签或说明豁免情形", risk_note: "预包装食品缺营养标签违反 GB 28050", source: "GB 28050-2011" },
+    { id: "R-YB-006", name: "保质期/日期异常", category: "YB", platform: "GENERAL", trigger: "生产日期晚于当前 / 保质期格式非法 / 临期（剩余<1/3保质期）——全产品线生效", level: "YELLOW", engine: "RULE", basis: { law: "GB 7718-2011、《食品安全法》第三十四条第（十）项、《直播电商经营者落实食品安全主体责任监督管理规定》第十八条第（十）项", note: "【已核对 2026-10-25】禁止生产经营超过保质期的食品；临期YELLOW、过期RED，2026-10-25 起全产品线生效", link: "https://www.gov.cn/gongbao/2026/issue_12666/202604/content_7065111.html" }, action: "过期产品直接禁播；临期产品黄灯标注", risk_note: "过期/临期食品存在安全隐患", source: "GB 7718-2011" },
+    { id: "R-BJ-001", name: "保健食品无蓝帽子标识", category: "BJ", platform: "GENERAL", trigger: "保健食品线且包装图未识别到蓝帽子专用标志", level: "RED", engine: "RULE", basis: { law: "蓝帽子专用标志规定", note: "条款【待核对】", link: "" }, action: "确认产品为保健食品并补充标志照片", risk_note: "保健食品无标志不得销售", source: "《保健食品管理办法》" },
+    { id: "R-BJ-002", name: "无注册号/备案号", category: "BJ", platform: "GENERAL", trigger: "缺少\"国食健字/卫食健字/食健备\"编号", level: "RED", engine: "RULE", basis: { law: "《保健食品注册与备案管理办法》", note: "2016年总局令第22号，条号【待核对】", link: "" }, action: "补充编号并跳转特殊食品信息查询平台人工核验", risk_note: "保健食品无注册/备案号不得销售", source: "《保健食品注册与备案管理办法》" },
+    { id: "R-BJ-003", name: "宣传超出注册批准功能", category: "BJ", platform: "GENERAL", trigger: "宣称功能不在产品注册的27种功能范围内", level: "RED", engine: "RULE", basis: { law: "《食品安全法》第七十八条", note: "条款【待核对】", link: "" }, action: "仅宣传获批功能与\"保健食品不是药物\"警示语", risk_note: "超范围宣传保健功能违法", source: "《食品安全法》" },
+    { id: "R-BJ-004", name: "缺少\"本品不能代替药物\"警示语", category: "BJ", platform: "GENERAL", trigger: "包装/页面未出现法定警示语", level: "YELLOW", engine: "RULE", basis: { law: "GB 16740-2014", note: "标签要求", link: "" }, action: "在显著位置补充警示语", risk_note: "保健食品标签缺法定警示语", source: "GB 16740-2014" },
+    { id: "R-NC-001", name: "承诺达标合格证缺失", category: "NC", platform: "GENERAL", trigger: "食用农产品线（农户/合作社主体）且未提供承诺达标合格证", level: "YELLOW", engine: "RULE", basis: { law: "《农产品质量安全法》（2022修订）", note: "条号【待核对】", link: "" }, action: "由生产主体开具承诺达标合格证；畜禽类另需检疫合格证明（见 R-NC-003）", risk_note: "食用农产品缺承诺达标合格证不合规", source: "《农产品质量安全法》" },
+    { id: "R-NC-002", name: "食用农产品误标SC", category: "NC", platform: "GENERAL", trigger: "初级农产品（未改变基本性状）却要求SC/误贴预包装标签", level: "GRAY", engine: "RULE", basis: { law: "《食品安全法》第三十五条豁免条款", note: "条款【待核对】", link: "" }, action: "提示\"初级农产品无需SC\"，建议回分流向导确认产品类型（防误杀）", risk_note: "防止\"带泥萝卜\"被误判为需SC", source: "《食品安全法》" },
+    { id: "R-NC-003", name: "畜禽类缺检疫合格证明", category: "NC", platform: "GENERAL", trigger: "食用农产品线且检疫合格证明选择“未提供”（选“已提供”或“不适用（非畜禽）”不触发）", level: "RED", engine: "RULE", basis: { law: "《食品安全法》第三十四条第（八）项、《直播电商经营者落实食品安全主体责任监督管理规定》第十八条第（八）项", note: "【已核对 2026-10-25】禁止经营未按规定检疫或检疫不合格的肉类；120号令第十六条第三款明确检疫合格证明可作为食用农产品的食品合格证明文件", link: "https://www.gov.cn/gongbao/2026/issue_12666/202604/content_7065111.html" }, action: "取得动物卫生监督机构出具的检疫合格证明后方可上播；无法提供的不得销售", risk_note: "未按规定检疫的肉类属禁止生产经营食品", source: "《食品安全法》《直播电商经营者落实食品安全主体责任监督管理规定》" },
+    { id: "R-DL-001", name: "未经授权使用地理标志专用标志", category: "DL", platform: "GENERAL", trigger: "出现地理标志名称/标志（烟台苹果等区域公用品牌）但未上传授权证明", level: "RED", engine: "RULE", basis: { law: "《地理标志专用标志使用管理办法》", note: "国家知识产权局公告第354号", link: "" }, action: "上传使用许可证明；无授权则删除标志与产区宣称", risk_note: "冒用地标标志违法", source: "国家知识产权局公告第354号" },
+    { id: "R-DL-002", name: "产区宣称与产地信息不符", category: "DL", platform: "GENERAL", trigger: "宣称\"烟台苹果\"但产地/SC区划码为其他市", level: "YELLOW", engine: "RULE", basis: { law: "与 R-COM-004 同源（虚假宣传）", note: "", link: "" }, action: "核对产地后修正宣称", risk_note: "产区宣称与事实不符涉嫌虚假宣传", source: "《广告法》" }
+  ]
+};
